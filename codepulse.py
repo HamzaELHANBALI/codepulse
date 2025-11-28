@@ -89,6 +89,7 @@ def main():
         created_at = latest_push["created_at"]
         # GitHub returns UTC time in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
         last_push_time = datetime.datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ")
+        last_push_time = last_push_time.replace(tzinfo=datetime.timezone.utc)
 
     now = datetime.datetime.now(datetime.timezone.utc)
     
