@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodePulse Visual Sequence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e1a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .visual-container {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            page-break-after: always;
+        }
+
+        /* Slide 1: The Problem */
+        #slide1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px;
+        }
+
+        .problem-title {
+            font-size: 72px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 20px;
+            margin: 60px 0;
+            max-width: 1200px;
+        }
+
+        .day-box {
+            width: 140px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.4);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .day-box.active {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border-color: #22c55e;
+            color: #ffffff;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+        }
+
+        .day-box.inactive {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .github-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            opacity: 0.6;
+        }
+
+        .problem-subtitle {
+            font-size: 36px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            max-width: 900px;
+            line-height: 1.5;
+            margin-top: 60px;
+        }
+
+        /* Slide 2: The Solution Architecture */
+        #slide2 {
+            padding: 80px;
+        }
+
+        .arch-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .architecture-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .component-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 280px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .component-box.scheduler {
+            border-color: rgba(251, 191, 36, 0.5);
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .component-box.core {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(99, 102, 241, 0.05);
+            width: 360px;
+        }
+
+        .component-box.service {
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .component-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .component-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .component-desc {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        .arrow {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(96, 165, 250, 0.5) 0%, rgba(96, 165, 250, 0) 100%);
+            position: relative;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: -6px;
+            width: 0;
+            height: 0;
+            border-left: 14px solid rgba(96, 165, 250, 0.5);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        /* Slide 3: Data Flow Sequence */
+        #slide3 {
+            padding: 80px;
+        }
+
+        .flow-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .sequence-flow {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .sequence-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-right: 40px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+        }
+
+        .step-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+        }
+
+        .step-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .step-desc {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .code-snippet {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: #4ade80;
+        }
+
+        .connector-line {
+            position: absolute;
+            left: 30px;
+            top: 60px;
+            width: 2px;
+            height: calc(100% - 60px);
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.5) 0%, rgba(139, 92, 246, 0) 100%);
+        }
+
+        /* Slide 4: Implementation Guide */
+        #slide4 {
+            padding: 80px;
+        }
+
+        .impl-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .implementation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .impl-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .impl-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .impl-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-right: 20px;
+        }
+
+        .impl-card-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .impl-steps {
+            list-style: none;
+        }
+
+        .impl-steps li {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: start;
+        }
+
+        .impl-steps li:last-child {
+            border-bottom: none;
+        }
+
+        .step-check {
+            color: #22c55e;
+            margin-right: 12px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-size: 14px;
+            margin: 8px 8px 8px 0;
+            color: #60a5fa;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .visual-container {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Slide 1: The Problem -->
+    <div class="visual-container" id="slide1">
+        <div class="problem-title">The Streak-Breaker Problem</div>
+
+        <div class="calendar-grid">
+            <div class="day-box active">Mon<div class="github-icon">✓</div>
+            </div>
+            <div class="day-box active">Tue<div class="github-icon">✓</div>
+            </div>
+            <div class="day-box active">Wed<div class="github-icon">✓</div>
+            </div>
+            <div class="day-box active">Thu<div class="github-icon">✓</div>
+            </div>
+            <div class="day-box active">Fri<div class="github-icon">✓</div>
+            </div>
+            <div class="day-box active">Sat<div class="github-icon">✓</div>
+            </div>
+            <div class="day-box inactive">Sun<div class="github-icon">✗</div>
+            </div>
+
+            <div class="day-box inactive">Mon<div class="github-icon">✗</div>
+            </div>
+            <div class="day-box inactive">Tue<div class="github-icon">✗</div>
+            </div>
+            <div class="day-box inactive">Wed<div class="github-icon">✗</div>
+            </div>
+            <div class="day-box inactive">Thu<div class="github-icon">✗</div>
+            </div>
+            <div class="day-box inactive">Fri<div class="github-icon">✗</div>
+            </div>
+            <div class="day-box inactive">Sat<div class="github-icon">✗</div>
+            </div>
+            <div class="day-box inactive">Sun<div class="github-icon">✗</div>
+            </div>
+        </div>
+
+        <div class="problem-subtitle">
+            You're crushing it all week, then life happens.<br>
+            Your streak dies. Your momentum vanishes.<br>
+            <strong>CodePulse keeps you accountable.</strong>
+        </div>
+    </div>
+
+    <!-- Slide 2: Architecture Overview -->
+    <div class="visual-container" id="slide2">
+        <div class="arch-title">How CodePulse Works</div>
+
+        <div class="architecture-flow">
+            <div class="component-box scheduler">
+                <div class="component-icon">⏰</div>
+                <div class="component-name">Scheduler</div>
+                <div class="component-desc">
+                    GitHub Actions or Vercel Cron triggers daily checks at 9 AM UTC
+                </div>
+            </div>
+
+            <div class="arrow"></div>
+
+            <div class="component-box core">
+                <div class="component-icon">⚙️</div>
+                <div class="component-name">CodePulse Core</div>
+                <div class="component-desc">
+                    Fetches your GitHub activity, analyzes last push, calculates time elapsed
+                </div>
+            </div>
+
+            <div class="arrow"></div>
+
+            <div class="component-box service">
+                <div class="component-icon">📱</div>
+                <div class="component-name">Notifications</div>
+                <div class="component-desc">
+                    Sends alerts via Telegram & Discord if >24hrs without a commit
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 100px; font-size: 24px; color: rgba(255, 255, 255, 0.6);">
+            <strong style="color: #60a5fa;">Zero infrastructure.</strong>
+            No servers to manage. Just set it and forget it.
+        </div>
+    </div>
+
+    <!-- Slide 3: Data Flow -->
+    <div class="visual-container" id="slide3">
+        <div class="flow-title">The Execution Flow</div>
+
+        <div class="sequence-flow">
+            <div class="sequence-step">
+                <div class="connector-line"></div>
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">🚀 Scheduler Triggers</div>
+                    <div class="step-desc">GitHub Actions or Vercel Cron wakes up daily and executes your Python script.
+                    </div>
+                    <div class="code-snippet">schedule: - cron: '0 9 * * *' # Every day at 9 AM UTC</div>
+                </div>
+            </div>
+
+            <div class="sequence-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">🔍 GitHub API Call</div>
+                    <div class="step-desc">Script fetches your public events from GitHub's API to find the latest
+                        PushEvent.</div>
+                    <div class="code-snippet">GET https://api.github.com/users/{username}/events/public</div>
+                </div>
+            </div>
+
+            <div class="sequence-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">⏱️ Time Calculation</div>
+                    <div class="step-desc">Analyzes the timestamp of your last push and calculates hours elapsed.</div>
+                    <div class="code-snippet">hours_since_push = (now - last_push_time).total_seconds() / 3600</div>
+                </div>
+            </div>
+
+            <div class="sequence-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-title">⚠️ Alert Decision</div>
+                    <div class="step-desc">If >24 hours: sends "Pulse is flat!" alert. Otherwise: logs "Pulse is strong
+                        🚀"</div>
+                    <div class="code-snippet">if hours_since_push > 24: send_notifications()</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Implementation -->
+    <div class="visual-container" id="slide4">
+        <div class="impl-title">Implementation Guide</div>
+
+        <div class="implementation-grid">
+            <!-- Setup Card -->
+            <div class="impl-card">
+                <div class="impl-header">
+                    <div class="impl-icon">🛠️</div>
+                    <div class="impl-card-title">Quick Setup</div>
+                </div>
+                <ul class="impl-steps">
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span>Clone the repo and install dependencies</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span>Create Telegram bot via @BotFather</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span>Setup Discord webhook in your server</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span>Add secrets to GitHub/Vercel environment</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span>Deploy and test your first run</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Environment Variables Card -->
+            <div class="impl-card">
+                <div class="impl-header">
+                    <div class="impl-icon">🔐</div>
+                    <div class="impl-card-title">Required Secrets</div>
+                </div>
+                <ul class="impl-steps">
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span><strong>GITHUB_USERNAME</strong> - Your GitHub handle</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span><strong>TELEGRAM_BOT_TOKEN</strong> - Bot API token</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span><strong>TELEGRAM_CHAT_ID</strong> - Your chat ID</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span><strong>WEBHOOK_URL</strong> - Discord webhook URL</span>
+                    </li>
+                    <li>
+                        <span class="step-check">✓</span>
+                        <span><strong>GITHUB_TOKEN</strong> - Optional, for higher limits</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Deployment Options Card -->
+            <div class="impl-card">
+                <div class="impl-header">
+                    <div class="impl-icon">🚢</div>
+                    <div class="impl-card-title">Deployment Options</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div style="margin-bottom: 20px;">
+                        <strong style="font-size: 20px; display: block; margin-bottom: 12px;">Option 1: GitHub
+                            Actions</strong>
+                        <span class="tech-badge">Free</span>
+                        <span class="tech-badge">Zero Config</span>
+                        <span class="tech-badge">Built-in CI/CD</span>
+                        <div style="margin-top: 12px; color: rgba(255, 255, 255, 0.7); font-size: 16px;">
+                            Best for: Developers already using GitHub
+                        </div>
+                    </div>
+                    <div>
+                        <strong style="font-size: 20px; display: block; margin-bottom: 12px;">Option 2: Vercel
+                            Cron</strong>
+                        <span class="tech-badge">Serverless</span>
+                        <span class="tech-badge">Global Edge</span>
+                        <span class="tech-badge">Auto-scaling</span>
+                        <div style="margin-top: 12px; color: rgba(255, 255, 255, 0.7); font-size: 16px;">
+                            Best for: Production apps with web UI
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tech Stack Card -->
+            <div class="impl-card">
+                <div class="impl-header">
+                    <div class="impl-icon">💻</div>
+                    <div class="impl-card-title">Tech Stack</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <span class="tech-badge">Python 3.x</span>
+                    <span class="tech-badge">Requests</span>
+                    <span class="tech-badge">GitHub API</span>
+                    <span class="tech-badge">Telegram Bot API</span>
+                    <span class="tech-badge">Discord Webhooks</span>
+                    <span class="tech-badge">YAML Workflows</span>
+                    <span class="tech-badge">Vercel Functions</span>
+                    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div style="font-size: 18px; color: rgba(255, 255, 255, 0.9); margin-bottom: 12px;">
+                            <strong>Total Lines of Code:</strong> ~150 lines
+                        </div>
+                        <div style="font-size: 18px; color: rgba(255, 255, 255, 0.9);">
+                            <strong>Setup Time:</strong> 15 minutes
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
